@@ -1,0 +1,226 @@
+/* Tailwind entrypoint (Tailwind v4) */
+@import "tailwindcss";
+
+/* Theme tokens used by Tailwind + custom CSS */
+:root {
+  --bg: 10 10 12;
+  --fg: 236 236 241;
+  --glass: 255 255 255;
+  --primary: 99 102 241;
+}
+
+/* Base styles */
+@layer base {
+  html {
+    direction: rtl;
+    perspective: 900px;
+  }
+
+  body {
+    @apply min-h-screen bg-zinc-950 text-zinc-50;
+    background-image:
+      radial-gradient(1100px circle at 15% 0%, rgba(99, 102, 241, 0.28), transparent 55%),
+      radial-gradient(1100px circle at 85% 20%, rgba(236, 72, 153, 0.18), transparent 55%),
+      radial-gradient(1100px circle at 50% 100%, rgba(16, 185, 129, 0.20), transparent 55%);
+    position: relative;
+    overflow-x: hidden;
+    transform-style: preserve-3d;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: -20vmax;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      conic-gradient(from 180deg at 50% 50%, rgba(99, 102, 241, 0.20), rgba(236, 72, 153, 0.20), rgba(16, 185, 129, 0.20), rgba(56, 189, 248, 0.20), rgba(99, 102, 241, 0.20)),
+      radial-gradient(35vmax 28vmax at 12% 18%, rgba(99, 102, 241, 0.72), transparent 60%),
+      radial-gradient(34vmax 26vmax at 82% 22%, rgba(236, 72, 153, 0.56), transparent 60%),
+      radial-gradient(34vmax 30vmax at 55% 86%, rgba(16, 185, 129, 0.50), transparent 62%),
+      radial-gradient(22vmax 20vmax at 50% 45%, rgba(56, 189, 248, 0.34), transparent 65%);
+    filter: blur(12px) saturate(1.45) contrast(1.05);
+    opacity: 0.88;
+    transform: translate3d(0, 0, 0);
+    animation: bgFloat 14s ease-in-out infinite;
+    will-change: transform;
+    mix-blend-mode: normal;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.22), transparent 2px),
+      radial-gradient(1px 1px at 82% 22%, rgba(255, 255, 255, 0.18), transparent 2px),
+      radial-gradient(1px 1px at 55% 86%, rgba(255, 255, 255, 0.16), transparent 2px),
+      radial-gradient(1px 1px at 50% 45%, rgba(255, 255, 255, 0.14), transparent 2px),
+      radial-gradient(1px 1px at 20% 70%, rgba(255, 255, 255, 0.12), transparent 2px),
+      radial-gradient(1px 1px at 70% 65%, rgba(255, 255, 255, 0.10), transparent 2px);
+    background-size: 220px 220px;
+    opacity: 0.14;
+    filter: blur(0.2px);
+    animation: starDrift 18s linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes starDrift {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(-1.2%, 1.2%, 0);
+    }
+  }
+
+  @keyframes bgFloat {
+    0% {
+      transform: translate3d(-1.5%, -1%, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(1.5%, 1.2%, 0) scale(1.03);
+    }
+    100% {
+      transform: translate3d(-1.5%, -1%, 0) scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::before {
+      animation: none;
+    }
+
+    body::after {
+      animation: none;
+    }
+  }
+}
+
+/* Reusable UI utilities (Glassmorphism) */
+@layer utilities {
+  .glass {
+    @apply border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_10px_30px_rgba(2,6,23,0.18),0_0_0_1px_rgba(99,102,241,0.10),0_0_55px_rgba(236,72,153,0.16),0_0_45px_rgba(56,189,248,0.10)];
+    position: relative;
+    transform-style: preserve-3d;
+    box-shadow:
+      0 14px 38px rgba(2, 6, 23, 0.32),
+      0 2px 0 rgba(255, 255, 255, 0.06) inset,
+      0 -1px 0 rgba(0, 0, 0, 0.35) inset,
+      0 0 0 1px rgba(99, 102, 241, 0.14),
+      0 0 44px rgba(236, 72, 153, 0.14);
+  }
+
+  .glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.10), transparent 55%);
+    transform: translateZ(1px);
+    opacity: 0.8;
+  }
+
+  .glass-hover {
+    @apply transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_45px_rgba(2,6,23,0.28)] active:translate-y-0;
+    transform: translateZ(0);
+  }
+
+  .glass-hover:hover {
+    transform: translateY(-3px);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-indigo-500 px-5 py-2.5 font-bold text-white transition duration-200 hover:bg-indigo-400 hover:shadow-[0_12px_34px_rgba(99,102,241,0.40),0_0_36px_rgba(236,72,153,0.32),0_0_28px_rgba(16,185,129,0.20)] active:translate-y-px active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950;
+    transform-style: preserve-3d;
+    box-shadow:
+      0 12px 28px rgba(99, 102, 241, 0.24),
+      0 9px 20px rgba(2, 6, 23, 0.33),
+      0 2px 0 rgba(255, 255, 255, 0.22) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.18) inset;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-2.5 font-bold text-white/90 transition duration-200 hover:bg-white/10 hover:border-white/25 hover:shadow-[0_12px_30px_rgba(2,6,23,0.25)] active:translate-y-px active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950;
+    transform-style: preserve-3d;
+    box-shadow:
+      0 14px 34px rgba(2, 6, 23, 0.32),
+      0 1px 0 rgba(255, 255, 255, 0.14) inset,
+      0 -1px 0 rgba(0, 0, 0, 0.35) inset;
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+  }
+
+  input,
+  textarea,
+  select {
+    transform-style: preserve-3d;
+    box-shadow:
+      0 12px 34px rgba(2, 6, 23, 0.32),
+      0 1px 0 rgba(255, 255, 255, 0.10) inset,
+      0 -1px 0 rgba(0, 0, 0, 0.40) inset;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    box-shadow:
+      0 16px 48px rgba(2, 6, 23, 0.42),
+      0 0 0 1px rgba(99, 102, 241, 0.25),
+      0 1px 0 rgba(255, 255, 255, 0.14) inset,
+      0 -1px 0 rgba(0, 0, 0, 0.40) inset;
+  }
+
+  @media (max-width: 768px) {
+    body::before {
+      filter: blur(10px) saturate(1.35) contrast(1.04);
+      opacity: 0.82;
+    }
+
+    body::after {
+      opacity: 0.1;
+    }
+
+    .glass {
+      box-shadow:
+        0 12px 30px rgba(2, 6, 23, 0.30),
+        0 2px 0 rgba(255, 255, 255, 0.05) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.32) inset,
+        0 0 0 1px rgba(99, 102, 241, 0.12);
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      box-shadow:
+        0 10px 24px rgba(2, 6, 23, 0.30),
+        0 1px 0 rgba(255, 255, 255, 0.12) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.30) inset;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-hover:hover,
+    .btn-primary:hover,
+    .btn-secondary:hover {
+      transform: none;
+    }
+  }
+
+  .title {
+    @apply text-3xl font-black tracking-tight md:text-4xl;
+  }
+
+  .subtitle {
+    @apply mt-3 text-base leading-8 text-white/70;
+  }
+}
