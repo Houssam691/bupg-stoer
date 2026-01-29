@@ -20,6 +20,18 @@
         "from": "customer",
         "text": "jk;\\m,j.,.m./m,",
         "createdAt": "2026-01-29T22:00:31.609Z"
+      },
+      {
+        "id": "msg-ml00bkly-sek6s",
+        "from": "customer",
+        "text": "3653543",
+        "createdAt": "2026-01-29T22:09:39.094Z"
+      },
+      {
+        "id": "msg-ml00bssg-6fpf3",
+        "from": "admin",
+        "text": "543352",
+        "createdAt": "2026-01-29T22:09:49.696Z"
       }
     ]
   }

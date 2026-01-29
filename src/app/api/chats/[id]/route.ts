@@ -4,13 +4,12 @@ import { generateMessageId, readChatsResult, writeChats } from "@/lib/chats";
 
 export const runtime = "nodejs";
 
-async function getChatId(ctx: { params: { id: string } | Promise<{ id: string }> }) {
-  const maybePromise = ctx.params as unknown as { then?: unknown };
-  const resolved = typeof maybePromise?.then === "function" ? await (ctx.params as Promise<{ id: string }>) : (ctx.params as { id: string });
+async function getChatId(ctx: { params: unknown }) {
+  const resolved = (await Promise.resolve(ctx.params)) as { id: string };
   return resolved.id;
 }
 
-export async function GET(_req: Request, ctx: { params: { id: string } | Promise<{ id: string }> }) {
+export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const id = await getChatId(ctx);
   const result = await readChatsResult();
   if (!result.ok) {
@@ -24,7 +23,7 @@ export async function GET(_req: Request, ctx: { params: { id: string } | Promise
   return NextResponse.json(chat);
 }
 
-export async function POST(req: Request, ctx: { params: { id: string } | Promise<{ id: string }> }) {
+export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const id = await getChatId(ctx);
 
   const body = (await req.json().catch(() => null)) as null | {
@@ -72,7 +71,7 @@ export async function POST(req: Request, ctx: { params: { id: string } | Promise
   return NextResponse.json(next);
 }
 
-export async function DELETE(_req: Request, ctx: { params: { id: string } | Promise<{ id: string }> }) {
+export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 type Product = {
   id: string;
@@ -13,6 +13,14 @@ type Product = {
 };
 
 export default function NewChatPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto grid max-w-2xl gap-6" />}>
+      <NewChatPageInner />
+    </Suspense>
+  );
+}
+
+function NewChatPageInner() {
   const router = useRouter();
   const params = useSearchParams();
 
