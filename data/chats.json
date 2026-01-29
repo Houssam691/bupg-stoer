@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": "chat-mkzzzu64-svodf",
+    "productId": "pubg-mkzxkbgy-vvidq",
+    "productTitle": "منتج جديد",
+    "product": {
+      "id": "pubg-mkzxkbgy-vvidq",
+      "category": "pubg",
+      "title": "منتج جديد",
+      "price": 0,
+      "description": "",
+      "image": "/uploads/placeholder.svg"
+    },
+    "customerName": "lm,jkm,..m,.m.",
+    "whatsapp": "45323123.13.3.",
+    "createdAt": "2026-01-29T22:00:31.609Z",
+    "messages": [
+      {
+        "id": "msg-mkzzzu64-6culd",
+        "from": "customer",
+        "text": "jk;\\m,j.,.m./m,",
+        "createdAt": "2026-01-29T22:00:31.609Z"
+      }
+    ]
+  }
+]

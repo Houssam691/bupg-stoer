@@ -428,15 +428,22 @@ export default function AdminApp() {
                     const last = c.messages[c.messages.length - 1];
                     const productTitle = c.productTitle || productTitleById.get(c.productId);
                     return (
-                      <button
+                      <div
                         key={c.id}
-                        type="button"
+                        role="button"
+                        tabIndex={0}
                         className={
                           c.id === activeChatId
                             ? "w-full rounded-2xl border border-indigo-400/30 bg-indigo-500/10 p-3 text-right"
                             : "w-full rounded-2xl border border-white/10 bg-white/5 p-3 text-right hover:bg-white/10"
                         }
                         onClick={() => setActiveChatId(c.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setActiveChatId(c.id);
+                          }
+                        }}
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="font-black text-white">{c.customerName}</div>
@@ -459,7 +466,7 @@ export default function AdminApp() {
                         <div className="mt-1 text-xs font-bold text-white/60">المنتج: {productTitle || c.productId}</div>
                         <div className="mt-1 text-xs font-bold text-white/60">واتساب: {c.whatsapp || "—"}</div>
                         <div className="mt-2 line-clamp-2 text-sm text-white/80">{last?.text || ""}</div>
-                      </button>
+                      </div>
                     );
                   })}
 
