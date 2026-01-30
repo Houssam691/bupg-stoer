@@ -3,6 +3,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
 import { put } from "@vercel/blob";
+import { handleUpload } from "@vercel/blob/client";
 
 export const runtime = "nodejs";
 
@@ -13,6 +14,24 @@ function canUseBlob() {
 export async function POST(req: Request) {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const contentType = req.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) {
+    const body = await req.json();
+    return await handleUpload({
+      request: req,
+      body,
+      onBeforeGenerateToken: async (pathname: string) => {
+        return {
+          allowedContentTypes: ["image/*"],
+          tokenPayload: JSON.stringify({ admin: true, pathname }),
+        };
+      },
+      onUploadCompleted: async () => {
+        // no-op
+      },
+    });
   }
 
   const formData = await req.formData();

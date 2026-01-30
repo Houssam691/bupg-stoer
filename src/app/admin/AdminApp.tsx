@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 
 type ProductCategory = "pubg" | "free-fire" | "topup";
 
@@ -153,10 +154,12 @@ export default function AdminApp() {
     void load();
     void loadChats();
     const t = setInterval(() => {
+      if (view !== "chats") return;
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
       void loadChats();
-    }, 3000);
+    }, 7000);
     return () => clearInterval(t);
-  }, []);
+  }, [view]);
 
   useEffect(() => {
     activeChatIdRef.current = activeChatId;
@@ -205,18 +208,16 @@ export default function AdminApp() {
     }
 
     let imageUrl = "/uploads/placeholder.svg";
-    const fd = new FormData();
-    fd.append("file", newProductImage);
-
-    const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
-    if (!uploadRes.ok) {
-      const txt = await uploadRes.text().catch(() => "");
-      setCreateError(`تعذر رفع الصورة (${uploadRes.status}). ${txt || ""}`.trim());
+    try {
+      const blob = await upload(newProductImage.name, newProductImage, {
+        access: "public",
+        handleUploadUrl: "/api/upload",
+      });
+      imageUrl = blob.url;
+    } catch {
+      setCreateError("تعذر رفع الصورة. جرّب صورة أصغر أو تحقق من إعدادات Blob في Vercel.");
       return;
     }
-
-    const uploadData = (await uploadRes.json()) as { url: string };
-    imageUrl = uploadData.url;
 
     const res = await fetch("/api/products", {
       method: "POST",
@@ -263,14 +264,15 @@ export default function AdminApp() {
   }
 
   async function uploadImage(file: File, product: Product) {
-    const fd = new FormData();
-    fd.append("file", file);
-
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    if (!res.ok) return;
-
-    const data = (await res.json()) as { url: string };
-    await save({ ...product, image: data.url });
+    try {
+      const blob = await upload(file.name, file, {
+        access: "public",
+        handleUploadUrl: "/api/upload",
+      });
+      await save({ ...product, image: blob.url });
+    } catch {
+      // ignore
+    }
   }
 
   return (
