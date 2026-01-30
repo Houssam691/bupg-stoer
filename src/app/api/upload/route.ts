@@ -16,23 +16,38 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  if (!canUseBlob()) {
+    return NextResponse.json(
+      { error: "Blob is not configured. Please set BLOB_READ_WRITE_TOKEN in Vercel Environment Variables." },
+      { status: 500 }
+    );
+  }
+
   const contentType = req.headers.get("content-type") || "";
   if (contentType.includes("application/json")) {
-    const body = await req.json();
-    const result = await handleUpload({
-      request: req,
-      body,
-      onBeforeGenerateToken: async (pathname: string) => {
-        return {
-          allowedContentTypes: ["image/*"],
-          tokenPayload: JSON.stringify({ admin: true, pathname }),
-        };
-      },
-      onUploadCompleted: async () => {
-        // no-op
-      },
-    });
-    return NextResponse.json(result);
+    try {
+      const body = await req.json();
+      const result = await handleUpload({
+        request: req,
+        body,
+        onBeforeGenerateToken: async (pathname: string) => {
+          return {
+            allowedContentTypes: ["image/*"],
+            tokenPayload: JSON.stringify({ admin: true, pathname }),
+          };
+        },
+        onUploadCompleted: async () => {
+          // no-op
+        },
+      });
+      return NextResponse.json(result);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "";
+      return NextResponse.json(
+        { error: `Blob upload init failed. ${msg || "Check BLOB_READ_WRITE_TOKEN and Vercel Blob configuration."}`.trim() },
+        { status: 500 }
+      );
+    }
   }
 
   const formData = await req.formData();
@@ -48,13 +63,19 @@ export async function POST(req: Request) {
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
   const filename = `${Date.now()}_${safeName}`;
 
-  if (canUseBlob()) {
+  try {
     const blob = await put(filename, buffer, {
       access: "public",
       contentType: file.type || "application/octet-stream",
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
     return NextResponse.json({ url: blob.url });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "";
+    return NextResponse.json(
+      { error: `Blob upload failed. ${msg || "Check BLOB_READ_WRITE_TOKEN and Vercel Blob configuration."}`.trim() },
+      { status: 500 }
+    );
   }
 
   const uploadsDir = path.join(process.cwd(), "public", "uploads");
