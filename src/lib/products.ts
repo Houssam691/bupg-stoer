@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 
 export type ProductCategory = "pubg" | "free-fire" | "topup";
 
@@ -21,9 +22,31 @@ function canUseKv() {
   return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 }
 
+function canUseUpstash() {
+  return Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+}
+
+function isVercel() {
+  return process.env.VERCEL === "1";
+}
+
 const KV_PRODUCTS_KEY = "bupg:products";
 
+const upstash = canUseUpstash()
+  ? new Redis({ url: process.env.UPSTASH_REDIS_REST_URL!, token: process.env.UPSTASH_REDIS_REST_TOKEN! })
+  : null;
+
 export async function readProducts(): Promise<Product[]> {
+  if (isVercel() && !canUseKv() && !canUseUpstash()) {
+    throw new Error(
+      "Persistent storage is not configured on Vercel. Please set either (KV_REST_API_URL, KV_REST_API_TOKEN) or (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) in Vercel Environment Variables."
+    );
+  }
+
+  if (upstash) {
+    const data = (await upstash.get(KV_PRODUCTS_KEY)) as unknown;
+    return Array.isArray(data) ? (data as Product[]) : [];
+  }
   if (canUseKv()) {
     const data = (await kv.get(KV_PRODUCTS_KEY)) as unknown;
     return Array.isArray(data) ? (data as Product[]) : [];
@@ -39,6 +62,16 @@ export async function readProducts(): Promise<Product[]> {
 }
 
 export async function writeProducts(nextProducts: Product[]): Promise<void> {
+  if (isVercel() && !canUseKv() && !canUseUpstash()) {
+    throw new Error(
+      "Persistent storage is not configured on Vercel. Please set either (KV_REST_API_URL, KV_REST_API_TOKEN) or (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) in Vercel Environment Variables."
+    );
+  }
+
+  if (upstash) {
+    await upstash.set(KV_PRODUCTS_KEY, nextProducts);
+    return;
+  }
   if (canUseKv()) {
     await kv.set(KV_PRODUCTS_KEY, nextProducts);
     return;

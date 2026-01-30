@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 
 export type ChatMessageFrom = "customer" | "admin";
 
@@ -39,9 +40,31 @@ function canUseKv() {
   return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 }
 
+function canUseUpstash() {
+  return Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+}
+
+function isVercel() {
+  return process.env.VERCEL === "1";
+}
+
 const KV_CHATS_KEY = "bupg:chats";
 
+const upstash = canUseUpstash()
+  ? new Redis({ url: process.env.UPSTASH_REDIS_REST_URL!, token: process.env.UPSTASH_REDIS_REST_TOKEN! })
+  : null;
+
 export async function readChats(): Promise<Chat[]> {
+  if (isVercel() && !canUseKv() && !canUseUpstash()) {
+    throw new Error(
+      "Persistent storage is not configured on Vercel. Please set either (KV_REST_API_URL, KV_REST_API_TOKEN) or (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) in Vercel Environment Variables."
+    );
+  }
+
+  if (upstash) {
+    const data = (await upstash.get(KV_CHATS_KEY)) as unknown;
+    return Array.isArray(data) ? (data as Chat[]) : [];
+  }
   if (canUseKv()) {
     const data = (await kv.get(KV_CHATS_KEY)) as unknown;
     return Array.isArray(data) ? (data as Chat[]) : [];
@@ -57,6 +80,14 @@ export async function readChats(): Promise<Chat[]> {
 }
 
 export async function readChatsResult(): Promise<{ ok: true; chats: Chat[] } | { ok: false; chats: [] }> {
+  if (isVercel() && !canUseKv() && !canUseUpstash()) {
+    return { ok: false, chats: [] };
+  }
+
+  if (upstash) {
+    const data = (await upstash.get(KV_CHATS_KEY)) as unknown;
+    return { ok: true, chats: Array.isArray(data) ? (data as Chat[]) : [] };
+  }
   if (canUseKv()) {
     const data = (await kv.get(KV_CHATS_KEY)) as unknown;
     return { ok: true, chats: Array.isArray(data) ? (data as Chat[]) : [] };
@@ -72,6 +103,16 @@ export async function readChatsResult(): Promise<{ ok: true; chats: Chat[] } | {
 }
 
 export async function writeChats(nextChats: Chat[]): Promise<void> {
+  if (isVercel() && !canUseKv() && !canUseUpstash()) {
+    throw new Error(
+      "Persistent storage is not configured on Vercel. Please set either (KV_REST_API_URL, KV_REST_API_TOKEN) or (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) in Vercel Environment Variables."
+    );
+  }
+
+  if (upstash) {
+    await upstash.set(KV_CHATS_KEY, nextChats);
+    return;
+  }
   if (canUseKv()) {
     await kv.set(KV_CHATS_KEY, nextChats);
     return;
