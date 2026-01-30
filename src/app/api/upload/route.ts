@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   const contentType = req.headers.get("content-type") || "";
   if (contentType.includes("application/json")) {
     const body = await req.json();
-    return await handleUpload({
+    const result = await handleUpload({
       request: req,
       body,
       onBeforeGenerateToken: async (pathname: string) => {
@@ -32,6 +32,7 @@ export async function POST(req: Request) {
         // no-op
       },
     });
+    return NextResponse.json(result);
   }
 
   const formData = await req.formData();
