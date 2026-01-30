@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { kv } from "@vercel/kv";
 
 export type ChatMessageFrom = "customer" | "admin";
 
@@ -34,7 +35,17 @@ function getChatsFilePath() {
   return path.join(process.cwd(), "data", "chats.json");
 }
 
+function canUseKv() {
+  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
+
+const KV_CHATS_KEY = "bupg:chats";
+
 export async function readChats(): Promise<Chat[]> {
+  if (canUseKv()) {
+    const data = (await kv.get(KV_CHATS_KEY)) as unknown;
+    return Array.isArray(data) ? (data as Chat[]) : [];
+  }
   const filePath = getChatsFilePath();
   try {
     const raw = await fs.readFile(filePath, "utf8");
@@ -46,6 +57,10 @@ export async function readChats(): Promise<Chat[]> {
 }
 
 export async function readChatsResult(): Promise<{ ok: true; chats: Chat[] } | { ok: false; chats: [] }> {
+  if (canUseKv()) {
+    const data = (await kv.get(KV_CHATS_KEY)) as unknown;
+    return { ok: true, chats: Array.isArray(data) ? (data as Chat[]) : [] };
+  }
   const filePath = getChatsFilePath();
   try {
     const raw = await fs.readFile(filePath, "utf8");
@@ -57,6 +72,10 @@ export async function readChatsResult(): Promise<{ ok: true; chats: Chat[] } | {
 }
 
 export async function writeChats(nextChats: Chat[]): Promise<void> {
+  if (canUseKv()) {
+    await kv.set(KV_CHATS_KEY, nextChats);
+    return;
+  }
   const filePath = getChatsFilePath();
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   const tmpPath = `${filePath}.tmp`;

@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { kv } from "@vercel/kv";
 
 export type ProductCategory = "pubg" | "free-fire" | "topup";
 
@@ -16,7 +17,17 @@ function getProductsFilePath() {
   return path.join(process.cwd(), "data", "products.json");
 }
 
+function canUseKv() {
+  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
+
+const KV_PRODUCTS_KEY = "bupg:products";
+
 export async function readProducts(): Promise<Product[]> {
+  if (canUseKv()) {
+    const data = (await kv.get(KV_PRODUCTS_KEY)) as unknown;
+    return Array.isArray(data) ? (data as Product[]) : [];
+  }
   const filePath = getProductsFilePath();
   try {
     const raw = await fs.readFile(filePath, "utf8");
@@ -28,6 +39,10 @@ export async function readProducts(): Promise<Product[]> {
 }
 
 export async function writeProducts(nextProducts: Product[]): Promise<void> {
+  if (canUseKv()) {
+    await kv.set(KV_PRODUCTS_KEY, nextProducts);
+    return;
+  }
   const filePath = getProductsFilePath();
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   const tmpPath = `${filePath}.tmp`;

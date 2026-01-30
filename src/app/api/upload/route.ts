@@ -2,8 +2,13 @@ import { NextResponse } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
+import { put } from "@vercel/blob";
 
 export const runtime = "nodejs";
+
+function canUseBlob() {
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+}
 
 export async function POST(req: Request) {
   if (!(await isAdminAuthenticated())) {
@@ -20,11 +25,21 @@ export async function POST(req: Request) {
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const filename = `${Date.now()}_${safeName}`;
+
+  if (canUseBlob()) {
+    const blob = await put(filename, buffer, {
+      access: "public",
+      contentType: file.type || "application/octet-stream",
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+    return NextResponse.json({ url: blob.url });
+  }
+
   const uploadsDir = path.join(process.cwd(), "public", "uploads");
   await fs.mkdir(uploadsDir, { recursive: true });
 
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const filename = `${Date.now()}_${safeName}`;
   const fullPath = path.join(uploadsDir, filename);
 
   await fs.writeFile(fullPath, buffer);

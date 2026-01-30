@@ -13,7 +13,7 @@
 @layer base {
   html {
     direction: rtl;
-    perspective: 900px;
+    perspective: 1400px;
   }
 
   *,
@@ -112,7 +112,7 @@
     position: relative;
     transform-style: preserve-3d;
     box-shadow:
-      0 14px 38px rgba(2, 6, 23, 0.32),
+      0 10px 28px rgba(2, 6, 23, 0.28),
       0 2px 0 rgba(255, 255, 255, 0.06) inset,
       0 -1px 0 rgba(0, 0, 0, 0.35) inset,
       0 0 0 1px rgba(99, 102, 241, 0.14),
@@ -136,35 +136,35 @@
   }
 
   .glass-hover:hover {
-    transform: translateY(-3px);
+    transform: translateY(-1px);
   }
 
   .btn-primary {
     @apply inline-flex items-center justify-center rounded-full bg-indigo-500 px-5 py-2.5 font-bold text-white transition duration-200 hover:bg-indigo-400 hover:shadow-[0_12px_34px_rgba(99,102,241,0.40),0_0_36px_rgba(236,72,153,0.32),0_0_28px_rgba(16,185,129,0.20)] active:translate-y-px active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950;
     transform-style: preserve-3d;
     box-shadow:
-      0 12px 28px rgba(99, 102, 241, 0.24),
-      0 9px 20px rgba(2, 6, 23, 0.33),
+      0 10px 22px rgba(99, 102, 241, 0.20),
+      0 8px 16px rgba(2, 6, 23, 0.30),
       0 2px 0 rgba(255, 255, 255, 0.22) inset,
       0 -2px 0 rgba(0, 0, 0, 0.18) inset;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
   }
 
   .btn-primary:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
   }
 
   .btn-secondary {
     @apply inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-2.5 font-bold text-white/90 transition duration-200 hover:bg-white/10 hover:border-white/25 hover:shadow-[0_12px_30px_rgba(2,6,23,0.25)] active:translate-y-px active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950;
     transform-style: preserve-3d;
     box-shadow:
-      0 14px 34px rgba(2, 6, 23, 0.32),
+      0 10px 26px rgba(2, 6, 23, 0.28),
       0 1px 0 rgba(255, 255, 255, 0.14) inset,
       0 -1px 0 rgba(0, 0, 0, 0.35) inset;
   }
 
   .btn-secondary:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
   }
 
   input,
@@ -172,7 +172,7 @@
   select {
     transform-style: preserve-3d;
     box-shadow:
-      0 12px 34px rgba(2, 6, 23, 0.32),
+      0 10px 28px rgba(2, 6, 23, 0.28),
       0 1px 0 rgba(255, 255, 255, 0.10) inset,
       0 -1px 0 rgba(0, 0, 0, 0.40) inset;
   }
@@ -181,7 +181,7 @@
   textarea:focus,
   select:focus {
     box-shadow:
-      0 16px 48px rgba(2, 6, 23, 0.42),
+      0 14px 40px rgba(2, 6, 23, 0.38),
       0 0 0 1px rgba(99, 102, 241, 0.25),
       0 1px 0 rgba(255, 255, 255, 0.14) inset,
       0 -1px 0 rgba(0, 0, 0, 0.40) inset;
@@ -199,7 +199,7 @@
 
     .glass {
       box-shadow:
-        0 12px 30px rgba(2, 6, 23, 0.30),
+        0 10px 24px rgba(2, 6, 23, 0.26),
         0 2px 0 rgba(255, 255, 255, 0.05) inset,
         0 -1px 0 rgba(0, 0, 0, 0.32) inset,
         0 0 0 1px rgba(99, 102, 241, 0.12);
@@ -208,7 +208,7 @@
     .btn-primary,
     .btn-secondary {
       box-shadow:
-        0 10px 24px rgba(2, 6, 23, 0.30),
+        0 9px 20px rgba(2, 6, 23, 0.26),
         0 1px 0 rgba(255, 255, 255, 0.12) inset,
         0 -1px 0 rgba(0, 0, 0, 0.30) inset;
     }

@@ -1,5 +1,29 @@
 [
   {
+    "id": "chat-ml02y6nr-6hkkh",
+    "productId": "pubg-mkzxkbgy-vvidq",
+    "productTitle": "منتج جديد",
+    "product": {
+      "id": "pubg-mkzxkbgy-vvidq",
+      "category": "pubg",
+      "title": "منتج جديد",
+      "price": 0,
+      "description": "",
+      "image": "/uploads/placeholder.svg"
+    },
+    "customerName": "لايلايلا",
+    "whatsapp": "5432543423435",
+    "createdAt": "2026-01-29T23:23:13.324Z",
+    "messages": [
+      {
+        "id": "msg-ml02y6nr-4hj52",
+        "from": "customer",
+        "text": "432345345",
+        "createdAt": "2026-01-29T23:23:13.324Z"
+      }
+    ]
+  },
+  {
     "id": "chat-mkzzzu64-svodf",
     "productId": "pubg-mkzxkbgy-vvidq",
     "productTitle": "منتج جديد",
