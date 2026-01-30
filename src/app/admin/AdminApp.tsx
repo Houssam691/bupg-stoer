@@ -54,6 +54,10 @@ export default function AdminApp() {
 
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [newProductPrice, setNewProductPrice] = useState<number>(0);
+  const [newProductDescription, setNewProductDescription] = useState<string>("");
+
   const [newProductImage, setNewProductImage] = useState<File | null>(null);
 
   const [view, setView] = useState<"products" | "chats">("products");
@@ -183,18 +187,36 @@ export default function AdminApp() {
   }
 
   async function create() {
-    let imageUrl = "/uploads/placeholder.svg";
+    setCreateError(null);
 
-    if (newProductImage) {
-      const fd = new FormData();
-      fd.append("file", newProductImage);
-
-      const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
-      if (uploadRes.ok) {
-        const data = (await uploadRes.json()) as { url: string };
-        imageUrl = data.url;
-      }
+    if (!newProductImage) {
+      setCreateError("اختر صورة للمنتج أولاً.");
+      return;
     }
+
+    if (!Number.isFinite(newProductPrice) || newProductPrice < 0) {
+      setCreateError("أدخل سعرًا صحيحًا.");
+      return;
+    }
+
+    if (!newProductDescription.trim()) {
+      setCreateError("أدخل وصفًا للمنتج.");
+      return;
+    }
+
+    let imageUrl = "/uploads/placeholder.svg";
+    const fd = new FormData();
+    fd.append("file", newProductImage);
+
+    const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
+    if (!uploadRes.ok) {
+      const txt = await uploadRes.text().catch(() => "");
+      setCreateError(`تعذر رفع الصورة (${uploadRes.status}). ${txt || ""}`.trim());
+      return;
+    }
+
+    const uploadData = (await uploadRes.json()) as { url: string };
+    imageUrl = uploadData.url;
 
     const res = await fetch("/api/products", {
       method: "POST",
@@ -202,15 +224,21 @@ export default function AdminApp() {
       body: JSON.stringify({
         category: active,
         title: "منتج جديد",
-        price: 0,
-        description: "",
+        price: newProductPrice,
+        description: newProductDescription,
         image: imageUrl,
       }),
     });
 
     if (res.ok) {
       setNewProductImage(null);
+      setNewProductPrice(0);
+      setNewProductDescription("");
       await load();
+      setCreateError(null);
+    } else {
+      const txt = await res.text().catch(() => "");
+      setCreateError(`تعذر إضافة المنتج (${res.status}). ${txt || ""}`.trim());
     }
   }
 
@@ -289,6 +317,25 @@ export default function AdminApp() {
                 </div>
               </div>
 
+              <div className="grid gap-2">
+                <span className="text-xs font-black text-white/70">السعر (دج)</span>
+                <input
+                  className="h-11 rounded-2xl border border-white/10 bg-white/5 px-4 text-white outline-none focus:border-indigo-400/50"
+                  type="number"
+                  value={newProductPrice}
+                  onChange={(e) => setNewProductPrice(Number(e.target.value))}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <span className="text-xs font-black text-white/70">الوصف</span>
+                <textarea
+                  className="min-h-[110px] rounded-2xl border border-white/10 bg-white/5 p-4 text-white outline-none focus:border-indigo-400/50"
+                  value={newProductDescription}
+                  onChange={(e) => setNewProductDescription(e.target.value)}
+                />
+              </div>
+
               <label className="inline-flex items-center justify-between gap-2 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-bold text-white/90 hover:bg-white/10">
                 <span>صورة المنتج الجديد</span>
                 <input
@@ -301,6 +348,12 @@ export default function AdminApp() {
                 />
                 <span className="max-w-[120px] truncate text-xs text-white/60">{newProductImage ? newProductImage.name : "اختيار"}</span>
               </label>
+
+              {createError ? (
+                <div className="rounded-2xl border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm font-bold text-rose-100">
+                  {createError}
+                </div>
+              ) : null}
 
               <button className="btn-primary w-full" onClick={create} type="button">
                 + إضافة منتج
