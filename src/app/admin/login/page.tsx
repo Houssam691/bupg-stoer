@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
 
           {error ? <div className="text-sm font-bold text-rose-300">{error}</div> : null}
 
-          <button className="btn-primary h-12" type="submit" disabled={loading}>
+          <button className="btn-primary h-12 w-full" type="submit" disabled={loading}>
             {loading ? "..." : "دخول"}
           </button>
         </form>

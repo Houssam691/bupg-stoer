@@ -30,7 +30,7 @@ export default function RootLayout({
       >
         <div className="min-h-screen">
           <header className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/50 backdrop-blur-xl">
-            <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
+            <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] md:flex-row md:items-center md:justify-between md:gap-4 md:py-4">
               <Link href="/" className="flex items-center gap-3 font-black tracking-tight">
                 <span className="h-9 w-9 rounded-2xl bg-gradient-to-br from-indigo-500 to-emerald-400 shadow-[0_10px_30px_rgba(2,6,23,0.18)]" />
                 <span>متجر الألعاب</span>
@@ -47,10 +47,25 @@ export default function RootLayout({
                   Top-up
                 </Link>
               </nav>
+
+              <nav className="flex items-center gap-2 overflow-x-auto pb-1 md:hidden" aria-label="التنقل الرئيسي">
+                <Link href="/pubg" className="btn-secondary whitespace-nowrap px-4 py-2">
+                  PUBG
+                </Link>
+                <Link href="/free-fire" className="btn-secondary whitespace-nowrap px-4 py-2">
+                  Free Fire
+                </Link>
+                <Link href="/topup" className="btn-secondary whitespace-nowrap px-4 py-2">
+                  Top-up
+                </Link>
+                <Link href="/services" className="btn-secondary whitespace-nowrap px-4 py-2">
+                  Services
+                </Link>
+              </nav>
             </div>
           </header>
 
-          <main className="mx-auto w-full max-w-6xl px-4 py-10">{children}</main>
+          <main className="mx-auto w-full max-w-6xl px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-6 md:py-10">{children}</main>
 
           <footer className="border-t border-white/10 py-10 text-white/70">
             <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 md:flex-row md:items-center md:justify-between">

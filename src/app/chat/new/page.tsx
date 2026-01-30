@@ -174,10 +174,10 @@ function NewChatPageInner() {
           {error ? <div className="text-sm font-bold text-rose-300">{error}</div> : null}
 
           <div className="flex flex-wrap gap-2">
-            <button className="btn-primary h-12" type="button" onClick={() => void createChat()} disabled={loading}>
+            <button className="btn-primary h-12 w-full sm:w-auto" type="button" onClick={() => void createChat()} disabled={loading}>
               {loading ? "..." : "بدء المحادثة"}
             </button>
-            <a className="btn-secondary" href="/">رجوع</a>
+            <a className="btn-secondary w-full sm:w-auto" href="/">رجوع</a>
           </div>
         </div>
       </section>

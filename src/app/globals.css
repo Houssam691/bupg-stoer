@@ -16,6 +16,12 @@
     perspective: 900px;
   }
 
+  *,
+  *::before,
+  *::after {
+    min-width: 0;
+  }
+
   body {
     @apply min-h-screen bg-zinc-950 text-zinc-50;
     background-image:

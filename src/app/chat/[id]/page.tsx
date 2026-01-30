@@ -94,7 +94,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
           </div>
 
           <div className="grid gap-2">
-            <div ref={scrollRef} className="h-[420px] overflow-y-auto glass rounded-3xl p-4">
+            <div ref={scrollRef} className="h-[55vh] max-h-[520px] min-h-[320px] overflow-y-auto glass rounded-3xl p-4">
               <div className="grid gap-3">
                 {(chat?.messages || []).map((m) => (
                   <div
@@ -116,7 +116,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
               </div>
             </div>
 
-            <div className="grid gap-2 md:grid-cols-[1fr_auto]">
+            <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
               <input
                 className="h-12 rounded-2xl border border-white/10 bg-white/5 px-4 text-white outline-none focus:border-indigo-400/50"
                 value={text}

@@ -10,7 +10,7 @@ export default function Home() {
           اختر القسم الذي تريده. ستجد منتجات جاهزة للعرض ويمكن للآدمن إدارتها من لوحة التحكم.
         </p>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap">
           <a className="btn-primary" href="/pubg">
             حسابات PUBG Mobile
           </a>
@@ -23,7 +23,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         <a className="glass glass-hover rounded-3xl p-6" href="/pubg">
           <div className="text-sm font-bold text-white/70">PUBG</div>
           <div className="mt-2 text-xl font-black">حسابات ببجي</div>
