@@ -56,9 +56,7 @@ const upstash = canUseUpstash()
 
 export async function readChats(): Promise<Chat[]> {
   if (isVercel() && !canUseKv() && !canUseUpstash()) {
-    throw new Error(
-      "Persistent storage is not configured on Vercel. Please set either (KV_REST_API_URL, KV_REST_API_TOKEN) or (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) in Vercel Environment Variables."
-    );
+    return [];
   }
 
   if (upstash) {
