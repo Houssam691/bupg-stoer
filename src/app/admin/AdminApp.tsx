@@ -52,6 +52,8 @@ export default function AdminApp() {
   const [active, setActive] = useState<ProductCategory>("pubg");
   const [saving, setSaving] = useState<string | null>(null);
 
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   const [newProductImage, setNewProductImage] = useState<File | null>(null);
 
   const [view, setView] = useState<"products" | "chats">("products");
@@ -85,9 +87,21 @@ export default function AdminApp() {
   }, [activeChat, items]);
 
   async function load() {
-    const res = await fetch("/api/products");
-    const data = (await res.json()) as Product[];
-    setItems(data);
+    try {
+      setLoadError(null);
+      const res = await fetch("/api/products", { cache: "no-store" });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        setLoadError(`تعذر تحميل المنتجات (${res.status}). ${txt || "تحقق من إعدادات التخزين على Vercel."}`);
+        setItems([]);
+        return;
+      }
+      const data = (await res.json()) as Product[];
+      setItems(Array.isArray(data) ? data : []);
+    } catch {
+      setLoadError("تعذر تحميل المنتجات. تحقق من الاتصال أو Logs في Vercel.");
+      setItems([]);
+    }
   }
 
   async function deleteMessage(chatId: string, messageId: string) {
@@ -112,16 +126,22 @@ export default function AdminApp() {
   }
 
   async function loadChats() {
-    const res = await fetch("/api/chats", { cache: "no-store" });
-    if (!res.ok) return;
-    const data = (await res.json()) as Chat[];
-    setChats(data);
+    let nextChats: Chat[] = [];
+    try {
+      const res = await fetch("/api/chats", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = (await res.json()) as Chat[];
+      nextChats = Array.isArray(data) ? data : [];
+      setChats(nextChats);
+    } catch {
+      // ignore
+    }
     const current = activeChatIdRef.current;
-    if (current && data.some((c) => c.id === current)) {
+    if (current && nextChats.some((c) => c.id === current)) {
       return;
     }
-    if (!current && data.length > 0) {
-      setActiveChatId(data[0].id);
+    if (!current && nextChats.length > 0) {
+      setActiveChatId(nextChats[0].id);
     }
   }
 
@@ -312,6 +332,11 @@ export default function AdminApp() {
       </aside>
 
       <main className="grid gap-4">
+        {loadError ? (
+          <div className="rounded-3xl border border-rose-400/30 bg-rose-500/10 p-4 text-sm font-bold text-rose-100">
+            {loadError}
+          </div>
+        ) : null}
         <section className="glass rounded-3xl p-5 md:p-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
