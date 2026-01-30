@@ -214,8 +214,11 @@ export default function AdminApp() {
         handleUploadUrl: "/api/upload",
       });
       imageUrl = blob.url;
-    } catch {
-      setCreateError("تعذر رفع الصورة. جرّب صورة أصغر أو تحقق من إعدادات Blob في Vercel.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "";
+      setCreateError(
+        `تعذر رفع الصورة. ${msg ? msg : "تحقق من إعدادات Blob في Vercel (BLOB_READ_WRITE_TOKEN)."}`
+      );
       return;
     }
 
